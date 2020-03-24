@@ -21,6 +21,10 @@
     let upgradeExp = 1.15;
 	
     //true productivity is prod/interval
+    let clickProd = 1;
+    let clickUpgradeProdExp = 1.1;
+    let clickUpgradeCost = 100;
+    let clickUpgradeCostExp = 1.15;
 	let gen1 = 0;
 	let gen1Cost = 10;
 	let gen1Prod = 0.5; //each worker producer 0.5 res /s
@@ -33,12 +37,16 @@
 	let totalProd = 0; //total res automatically produced /s
 	
 	function clicked() {
-		res += 1;
+		res += clickProd;
 	}
+    function upgradeClick() {
+        res -= clickUpgradeCost;
+        clickProd = clickProd * clickUpgradeProdExp;
+        clickUpgradeCost = clickUpgradeCost * clickUpgradeCostExp;
+    }
 	function reset() {
 		res = 0;
 		paradigm = 0;
-		workers = 0;
         gen1 = 0;
         gen2 = 0;
         gen1Cost = 0;
@@ -71,46 +79,45 @@
 	function gen1ResProd() {
 		res += gen1Prod * gen1
 	}
-	setInterval(gen1ResProd, gen1Interval*1000)
+    setInterval(gen1ResProd, gen1Interval*1000);
 	
     function gen2ResProd() {
         res += gen2Prod * gen2
     }
-    setInterval(gen2ResProd, gen2Interval*1000)
+    setInterval(gen2ResProd, gen2Interval*1000);
 	
 	/* Paradigms */
     //@TODO: Make it so paradigms, once achieved, are permanent
-	$: if (res > PTHRESH[1] && res <= PTHRESH[2]) {
-		paradigm = 1;
-	} else if (res > PTHRESH[2] && res <= PTHRESH[3]) {
-		paradigm = 2;
-	} else if (res > PTHRESH[3] && res <= PTHRESH[4]) {
-		paradigm = 3;
-	} else if (res > PTHRESH[4] && res <= PTHRESH[5]) {
-		paradigm = 4;
-	} else if (res > PTHRESH[5] && res <= PTHRESH[6]) {
-		paradigm = 5;
-	}
+    $: if (res > PTHRESH[paradigm+1]){
+		paradigm++;
+    }
 </script>
 
 <h1>Paradigm {paradigm}</h1>
 <p><b>Resources: </b> {res}</p>
-<p><b>Productivity: </b> {totalProd} res per second</p>
+<p><b>Productivity: </b> {Math.floor(totalProd)} res per second</p>
 <p>
 	<button on:click={clicked}>
-	Increase res
+        Increase res (produce {Math.floor(clickProd)} res)
 </button>
 </p>
+{#if paradigm > 2 && res > 0}
+<p>
+    <button on:click={upgradeClick}>
+        Upgrade click prod to {Math.floor(clickProd*clickUpgradeProdExp)}/click. Cost: {Math.floor(clickUpgradeCost)}
+    </button>
+</p>
+{/if}
 <hr/>
 <!-- GEN 1 ---------------------------------------- -->
 {#if paradigm > 0 && res > 0}
 <p>
 	<button on:click={addGen1}>
-        Add Gen 1 (cost: {gen1Cost}, #: {gen1}, prod: {gen1Prod}/{gen1Interval}s)
+        Add Gen 1 (cost: {Math.floor(gen1Cost)}, #: {gen1}, prod: {Math.floor(gen1Prod)}/{gen1Interval}s)
 </button> 
 </p>
 <p>
-    <b>Gen 1 workers:</b> {gen1}&nbsp;|&nbsp;<b>Gen 1 productivity:</b> {gen1Prod}/{gen1Interval}s
+    <b>Gen 1 workers:</b> {gen1}&nbsp;|&nbsp;<b>Gen 1 productivity:</b> {Math.floor(gen1Prod)}/{gen1Interval}s
 </p>
 <hr/>
 {/if}
@@ -118,11 +125,11 @@
 {#if paradigm > 1 && res > 0}
 <p>
 	<button on:click={addGen2}>
-        Add Gen 2 (cost: {gen2Cost}, #: {gen2}, prod: {gen2Prod}/{gen2Interval}s)
+        Add Gen 2 (cost: {Math.floor(gen2Cost)}, #: {gen2}, prod: {Math.floor(gen2Prod)}/{gen2Interval}s)
 </button> 
 </p>
 <p>
-    <b>Gen 2 workers:</b> {gen2}&nbsp;|&nbsp;<b>Gen 2 productivity:</b> {gen1Prod}/{gen2Interval}s
+    <b>Gen 2 workers:</b> {gen2}&nbsp;|&nbsp;<b>Gen 2 productivity:</b> {Math.floor(gen1Prod)}/{gen2Interval}s
 </p>
 <hr/>
 {/if}
