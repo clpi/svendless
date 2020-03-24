@@ -94,6 +94,7 @@
 </script>
 
 <h1>Paradigm {paradigm}</h1>
+<p>Next upgrade: Paradigm {paradigm+1} at {PTHRESH[paradigm+1]}</p>
 <p><b>Resources: </b> {res}</p>
 <p><b>Productivity: </b> {totalProd} res per second</p>
 <p>
@@ -117,7 +118,7 @@
 </button> 
 </p>
 <p>
-    <b>Gen 1 workers:</b> {gen1}&nbsp;|&nbsp;<b>Gen 1 productivity:</b> {gen1Prod}/{gen1Interval}s
+    <b>Gen 1 workers:</b> {gen1}&nbsp;|&nbsp;<b>Gen 1 productivity:</b> {gen1Prod}/{gen1Interval}s&nbsp;|&nbsp;<b>Gen 1 total productivity:</b> {gen1Prod*gen1/gen1Interval}/s
 </p>
 <hr/>
 {/if}
@@ -129,7 +130,8 @@
 </button> 
 </p>
 <p>
-    <b>Gen 2 workers:</b> {gen2}&nbsp;|&nbsp;<b>Gen 2 productivity:</b> {gen1Prod}/{gen2Interval}s
+    <b>Gen 2 workers:</b> {gen2}&nbsp;|&nbsp;<b>Gen 2 productivity:</b> {gen2Prod}/{gen2Interval}s&nbsp;|&nbsp;<b>Gen 2 total productivity:</b> {gen2Prod*gen2/gen2Interval}/s
+
 </p>
 <hr/>
 {/if}
