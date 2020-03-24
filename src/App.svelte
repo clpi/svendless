@@ -18,11 +18,18 @@
 	
 	let paradigm = 0;
 	let res = 0;
+    let upgradeExp = 1.15;
 	
+    //true productivity is prod/interval
 	let gen1 = 0;
 	let gen1Cost = 10;
 	let gen1Prod = 0.5; //each worker producer 0.5 res /s
-	
+    let gen1Interval = 1; //1s interval
+    let gen2 = 0;
+    let gen2Cost = 100;
+    let gen2Prod = 25;
+    let gen2Interval = 5;
+
 	let totalProd = 0; //total res automatically produced /s
 	
 	function clicked() {
@@ -32,29 +39,47 @@
 		res = 0;
 		paradigm = 0;
 		workers = 0;
+        gen1 = 0;
+        gen2 = 0;
+        gen1Cost = 0;
+        gen2Cost = 0;
 	}
 	function addGen1() {
 		res -= gen1Cost;
 		gen1 += 1;
-		gen1Cost = gen1Cost * 1.5;
-		updateTotalProd("gen1")
+		gen1Cost = gen1Cost * upgradeExp;
+        updateTotalProd("gen1");
 	}
+    function addGen2() {
+        res -= gen2Cost;
+        gen2 += 1;
+        gen2Cost = gen2Cost * upgradeExp;
+        updateTotalProd("gen2");
+    }
 	
 	function updateTotalProd(worker) {
 		switch(worker) {
 			case "gen1":
-				totalProd += gen1Prod;
+				totalProd += gen1Prod/gen1Interval;
 				break;
+            case "gen2":
+                totalProd += gen2Prod/gen2Interval;
+                break;
 		}
 	}
-	
-	function autoprodRes() {
-		res += totalProd
+    	
+	function gen1ResProd() {
+		res += gen1Prod * gen1
 	}
-	setInterval(autoprodRes, 1000)
+	setInterval(gen1ResProd, gen1Interval*1000)
 	
+    function gen2ResProd() {
+        res += gen2Prod * gen2
+    }
+    setInterval(gen2ResProd, gen2Interval*1000)
 	
 	/* Paradigms */
+    //@TODO: Make it so paradigms, once achieved, are permanent
 	$: if (res > PTHRESH[1] && res <= PTHRESH[2]) {
 		paradigm = 1;
 	} else if (res > PTHRESH[2] && res <= PTHRESH[3]) {
@@ -78,15 +103,29 @@
 </p>
 <hr/>
 <!-- GEN 1 ---------------------------------------- -->
+{#if paradigm > 0 && res > 0}
 <p>
 	<button on:click={addGen1}>
-	Add worker (cost: {gen1Cost}, #: {gen1}, prod: {gen1Prod})
+        Add Gen 1 (cost: {gen1Cost}, #: {gen1}, prod: {gen1Prod}/{gen1Interval}s)
 </button> 
 </p>
 <p>
-	<b>Gen 1 workers:</b> {gen1}   |   <b>Gen 1 productivity:</b> {gen1Prod}
+    <b>Gen 1 workers:</b> {gen1}&nbsp;|&nbsp;<b>Gen 1 productivity:</b> {gen1Prod}/{gen1Interval}s
 </p>
 <hr/>
+{/if}
+<!-- GEN 2 ---------------------------------------- -->
+{#if paradigm > 1 && res > 0}
+<p>
+	<button on:click={addGen2}>
+        Add Gen 2 (cost: {gen2Cost}, #: {gen2}, prod: {gen2Prod}/{gen2Interval}s)
+</button> 
+</p>
+<p>
+    <b>Gen 2 workers:</b> {gen2}&nbsp;|&nbsp;<b>Gen 2 productivity:</b> {gen1Prod}/{gen2Interval}s
+</p>
+<hr/>
+{/if}
 <!-- SETTINGS ---------------------------------------- -->
 <p>
 <button on:click={reset}>
